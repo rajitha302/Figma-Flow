@@ -159,7 +159,15 @@ function findOptimalPath(startNode, endNode, obstacles) {
 
 ## 💻 Technical Implementation
 
-### Figma Plugin API Requirements
+### Figma Plugin API Requirements (Updated 2025)
+
+**Official Documentation**: https://developers.figma.com/docs/plugins/
+
+#### Development Environment
+- **Language**: JavaScript/TypeScript (TypeScript strongly recommended)
+- **Runtime**: Browser-based environment
+- **API Access**: Through the global `figma` object
+- **Typings**: Install via `npm install --save-dev @figma/plugin-typings`
 
 #### Essential APIs
 ```javascript
@@ -169,6 +177,10 @@ figma.createVector() // Create arrow paths
 figma.createText() // Create annotations
 figma.on('selectionchange') // Monitor selection
 figma.on('nodechange') // Track position changes
+
+// Global variables available
+__html__ // Access to HTML UI content
+__uiFiles__ // Access to UI files
 ```
 
 #### Data Structure
@@ -198,31 +210,49 @@ const flowConnection = {
 4. **Throttling**: Limit update frequency
 5. **Web Workers**: Offload pathfinding calculations
 
+### Plugin Development Requirements (2025)
+
+#### Browser Environment Considerations
+- Plugins run in a browser-based sandbox environment
+- All API methods are asynchronous
+- Limited access to external fonts and team libraries
+- Network access controlled via `networkAccess` in manifest
+
+#### Key API Limitations
+- **No Direct File System Access**: All file operations through Figma API
+- **User-Initiated**: Plugins cannot run automatically on file open
+- **Iframe UI**: Custom UI runs in isolated iframe context
+- **No Version Rollback**: Users cannot downgrade to previous versions
+
+#### Communication Pattern
+```javascript
+// Main plugin code (code.ts)
+figma.ui.postMessage({ type: 'action', data: {} });
+
+figma.ui.onmessage = (msg) => {
+  // Handle messages from UI
+};
+
+// UI code (ui.html)
+parent.postMessage({ pluginMessage: { type: 'action' } }, '*');
+
+window.onmessage = (event) => {
+  const msg = event.data.pluginMessage;
+  // Handle messages from plugin code
+};
+```
+
 ## 🚀 Development Roadmap
 
-### Phase 1: MVP (Week 1-2)
-- [ ] Basic selection and connection
-- [ ] Simple straight-line arrows
-- [ ] Basic arrow styles
-- [ ] Plugin UI scaffold
+For detailed implementation progress and feature tracking, see [ROADMAP.md](ROADMAP.md).
 
-### Phase 2: Smart Routing (Week 3-4)
-- [ ] Obstacle detection
-- [ ] Pathfinding algorithm
-- [ ] Orthogonal routing
-- [ ] Auto-update on move
+**Current Phase**: MVP (Phase 1) - 40% Complete
 
-### Phase 3: Customization (Week 5-6)
-- [ ] Full style controls
-- [ ] Text annotations
-- [ ] Terminal offsets
-- [ ] Hand-drawn style
-
-### Phase 4: Polish (Week 7-8)
-- [ ] Performance optimization
-- [ ] Bulk operations
-- [ ] Export/import settings
-- [ ] Documentation
+Quick overview:
+- **Phase 1 (MVP)**: Basic connection system, UI scaffold, simple arrows
+- **Phase 2 (Smart Routing)**: A* pathfinding, obstacle detection, auto-updates
+- **Phase 3 (Customization)**: Full styling, annotations, offsets
+- **Phase 4 (Polish)**: Performance optimization, bulk operations, documentation
 
 ## 🔑 Key Features & Capabilities
 
@@ -268,20 +298,56 @@ figmaflow/
     └── icons/
 ```
 
-### Sample manifest.json
+### Sample manifest.json (Updated 2025)
+
+**Official Documentation**: https://developers.figma.com/docs/plugins/manifest/
+
+#### Required Fields
 ```json
 {
   "name": "FigmaFlow",
   "id": "figmaflow-plugin",
   "api": "1.0.0",
-  "main": "code.js",
-  "ui": "ui.html",
-  "editorType": ["figma"],
-  "permissions": [],
-  "description": "Create unlimited flow diagrams with intelligent routing and auto-updates. A powerful, free tool for user flow visualization.",
-  "version": "1.0.0"
+  "main": "dist/code.js",
+  "documentAccess": "dynamic-page"
 }
 ```
+
+#### Full Configuration with Optional Fields
+```json
+{
+  "name": "FigmaFlow",
+  "id": "figmaflow-plugin",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma", "figjam"],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "menu": [
+    {
+      "name": "Create Flow",
+      "command": "create-flow"
+    }
+  ],
+  "relaunchButtons": [
+    {
+      "command": "edit-flow",
+      "name": "Edit Flow"
+    }
+  ]
+}
+```
+
+#### Key Changes from Previous Versions
+- **`documentAccess`**: Now REQUIRED field (must be set to "dynamic-page")
+- **`permissions`**: Only include if needed (omit if empty)
+- **`description`**: Not a valid field in manifest (use for Figma Community listing)
+- **`version`**: Not used in manifest file
+- **`networkAccess`**: Controls external network resources (important for security)
+- **`editorType`**: Specify where plugin works (Figma, FigJam, Dev Mode)
 
 ## 🎯 Success Metrics
 - Zero cost for users
@@ -290,12 +356,28 @@ figmaflow/
 - Support for 1000+ simultaneous flows
 - Smooth performance with complex designs
 
-## 📚 Resources & References
-- Figma Plugin API Documentation
+## 📚 Resources & References (Updated 2025)
+
+### Official Figma Documentation
+- **Plugin Docs**: https://developers.figma.com/docs/plugins/
+- **API Reference**: https://developers.figma.com/docs/plugins/api/api-reference/
+- **Manifest Guide**: https://developers.figma.com/docs/plugins/manifest/
+- **Plugin Typings**: `@figma/plugin-typings` (npm package)
+
+### Technical Resources
 - A* Pathfinding Algorithm implementations
 - Bezier curve mathematics for smooth paths
 - SVG path generation techniques
 - Graph theory for optimal routing
+
+### Best Practices from Figma
+1. **Use TypeScript** - Strongly recommended for plugin development
+2. **Asynchronous Methods** - Plugin API uses async operations
+3. **User-Initiated Actions** - Plugins must be triggered by user
+4. **Custom UI** - Create UI matching Figma's design system
+5. **Error Tracking** - Implement your own analytics/error tracking
+6. **Testing** - Plugins reviewed before initial publication
+7. **Updates** - Can publish updates immediately after first approval
 
 ## 🚀 Quick Start Guide
 

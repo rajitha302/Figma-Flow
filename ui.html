@@ -11,91 +11,123 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 12px;
-      color: #1D1D1F;
-      background: #ffffff;
-      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      color: #1d1d1f;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8ebf0 100%);
+      padding: 12px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       padding-bottom: 12px;
-      border-bottom: 1px solid #e5e5e5;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     h1 {
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 600;
-      color: #5E5CE6;
+      color: #1d1d1f;
+      letter-spacing: -0.2px;
     }
 
     .status-toggle {
       display: flex;
-      gap: 8px;
+      gap: 3px;
       align-items: center;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 3px;
+      border-radius: 7px;
+      border: 0.5px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .toggle-btn {
-      padding: 6px 12px;
-      border: 1px solid #e5e5e5;
-      border-radius: 6px;
-      background: white;
+      padding: 4px 11px;
+      border: none;
+      border-radius: 5px;
+      background: transparent;
       cursor: pointer;
-      font-size: 11px;
-      transition: all 0.2s;
+      font-size: 10px;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: rgba(0, 0, 0, 0.5);
     }
 
     .toggle-btn.active {
-      background: #5E5CE6;
-      color: white;
-      border-color: #5E5CE6;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1d1d1f;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+                  0 1px 2px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .toggle-btn:hover:not(.active) {
-      background: #f5f5f5;
+      color: rgba(0, 0, 0, 0.7);
+      background: rgba(255, 255, 255, 0.3);
     }
 
     .section {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .section-title {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #666;
-      margin-bottom: 12px;
+      letter-spacing: 0.8px;
+      color: rgba(0, 0, 0, 0.4);
+      margin-bottom: 10px;
     }
 
     .form-group {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     label {
       display: block;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
-      margin-bottom: 6px;
-      color: #333;
+      margin-bottom: 5px;
+      color: #666;
     }
 
     select, input[type="number"], input[type="text"] {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #e5e5e5;
-      border-radius: 4px;
+      padding: 7px 10px;
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 6px;
       font-size: 11px;
       font-family: inherit;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.8);
     }
 
     select:focus, input:focus {
       outline: none;
-      border-color: #5E5CE6;
+      border-color: rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+                  0 1px 3px rgba(0, 0, 0, 0.06),
+                  inset 0 1px 1px rgba(255, 255, 255, 1);
+    }
+
+    select:hover, input:hover {
+      border-color: rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.85);
     }
 
     .input-row {
@@ -114,11 +146,22 @@
     }
 
     input[type="color"] {
-      width: 40px;
-      height: 32px;
-      border: 1px solid #e5e5e5;
-      border-radius: 4px;
+      width: 36px;
+      height: 30px;
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 6px;
       cursor: pointer;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input[type="color"]:hover {
+      border-color: rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
     }
 
     .checkbox-group {
@@ -128,96 +171,145 @@
       margin-bottom: 8px;
     }
 
-    input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
+    .checkbox-group label {
+      margin: 0;
       cursor: pointer;
+      font-size: 11px;
+      color: #333;
+    }
+
+    input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #007AFF;
     }
 
     .stats {
-      background: #f5f5f7;
-      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 8px 12px;
       border-radius: 8px;
-      margin-bottom: 12px;
-      text-align: center;
+      margin-bottom: 16px;
+      border: 0.5px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     .stats-label {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 4px;
+      font-size: 10px;
+      color: rgba(0, 0, 0, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 500;
     }
 
     .stats-value {
-      font-size: 24px;
+      font-size: 16px;
       font-weight: 600;
-      color: #5E5CE6;
-    }
-
-    .stats-unlimited {
-      font-size: 11px;
-      color: #34C759;
-      font-weight: 600;
-      margin-top: 4px;
+      color: #1d1d1f;
+      letter-spacing: -0.3px;
     }
 
     .button-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
     button {
       flex: 1;
-      padding: 10px;
+      padding: 9px 12px;
       border: none;
-      border-radius: 6px;
-      font-size: 11px;
+      border-radius: 8px;
+      font-size: 10px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.2px;
     }
 
     .btn-primary {
-      background: #5E5CE6;
+      background: linear-gradient(180deg, #1d1d1f 0%, #000000 100%);
       color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+                  0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .btn-primary:hover {
-      background: #4c4acc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                  0 2px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     }
 
     .btn-danger {
-      background: #ff3b30;
+      background: linear-gradient(180deg, #ff453a 0%, #ff3b30 100%);
       color: white;
+      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.25),
+                  0 1px 2px rgba(255, 59, 48, 0.2);
     }
 
     .btn-danger:hover {
-      background: #e6342a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3),
+                  0 2px 4px rgba(255, 59, 48, 0.25);
+    }
+
+    .btn-danger:active {
+      transform: translateY(0);
     }
 
     .btn-secondary {
-      background: #f5f5f7;
-      color: #333;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      color: #1d1d1f;
+      border: 0.5px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .btn-secondary:hover {
-      background: #e5e5e7;
+      background: rgba(255, 255, 255, 0.85);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(0);
     }
 
     .instructions {
-      background: #f5f5f7;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       padding: 12px;
       border-radius: 8px;
-      font-size: 11px;
-      color: #666;
-      line-height: 1.5;
-      margin-top: 20px;
+      font-size: 10px;
+      color: rgba(0, 0, 0, 0.6);
+      line-height: 1.6;
+      margin-top: 16px;
+      border: 0.5px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     .instructions strong {
-      color: #333;
+      color: #1d1d1f;
       display: block;
       margin-bottom: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
   </style>
 </head>
@@ -233,7 +325,6 @@
   <div class="stats">
     <div class="stats-label">Total Flows</div>
     <div class="stats-value" id="flowCount">0</div>
-    <div class="stats-unlimited">∞ Unlimited</div>
   </div>
 
   <div class="section">
@@ -252,11 +343,11 @@
     <div class="input-row">
       <div class="form-group">
         <label>Color</label>
-        <input type="color" id="strokeColor" value="#5E5CE6">
+        <input type="color" id="strokeColor" value="#000000">
       </div>
       <div class="form-group">
         <label>Width (px)</label>
-        <input type="number" id="strokeWidth" value="2" min="1" max="10">
+        <input type="number" id="strokeWidth" value="20" min="1" max="50">
       </div>
     </div>
 
@@ -264,7 +355,7 @@
       <div class="form-group">
         <label>Start Terminal</label>
         <select id="startTerminal">
-          <option value="none">None</option>
+          <option value="none" selected>None</option>
           <option value="arrow">Arrow</option>
           <option value="circle">Circle</option>
           <option value="diamond">Diamond</option>
@@ -293,19 +384,24 @@
     </div>
 
     <div class="checkbox-group">
-      <input type="checkbox" id="orthogonal">
+      <input type="checkbox" id="orthogonal" checked>
       <label for="orthogonal">Orthogonal lines only</label>
     </div>
 
     <div class="input-row">
       <div class="form-group">
         <label>Start Offset (px)</label>
-        <input type="number" id="startOffset" value="5" min="0" max="50">
+        <input type="number" id="startOffset" value="20" min="0" max="100">
       </div>
       <div class="form-group">
         <label>End Offset (px)</label>
-        <input type="number" id="endOffset" value="5" min="0" max="50">
+        <input type="number" id="endOffset" value="20" min="0" max="100">
       </div>
+    </div>
+
+    <div class="form-group">
+      <label>Corner Radius (px)</label>
+      <input type="number" id="cornerRadius" value="8" min="0" max="50">
     </div>
   </div>
 
@@ -330,14 +426,6 @@
   <div class="button-row">
     <button class="btn-danger" id="clearAllBtn">Clear All</button>
     <button class="btn-secondary" id="settingsBtn">Settings</button>
-  </div>
-
-  <div class="instructions">
-    <strong>How to use:</strong>
-    1. Select first object<br>
-    2. Hold Shift and select second object<br>
-    3. Flow arrow is created automatically<br>
-    4. Repeat for unlimited connections
   </div>
 
   <script>
@@ -390,6 +478,111 @@
     setInterval(() => {
       parent.postMessage({ pluginMessage: { type: 'get-stats' } }, '*');
     }, 1000);
+
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16) / 255,
+        g: parseInt(result[2], 16) / 255,
+        b: parseInt(result[3], 16) / 255
+      } : null;
+    }
+
+    // Listen for style changes
+    document.getElementById('lineType').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          lineType: e.target.value
+        }
+      }, '*');
+    };
+
+    document.getElementById('strokeColor').onchange = (e) => {
+      const rgb = hexToRgb(e.target.value);
+      if (rgb) {
+        parent.postMessage({
+          pluginMessage: {
+            type: 'update-style',
+            strokeColor: rgb
+          }
+        }, '*');
+      }
+    };
+
+    document.getElementById('strokeWidth').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          strokeWidth: parseInt(e.target.value)
+        }
+      }, '*');
+    };
+
+    document.getElementById('startTerminal').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          startTerminal: e.target.value
+        }
+      }, '*');
+    };
+
+    document.getElementById('endTerminal').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          endTerminal: e.target.value
+        }
+      }, '*');
+    };
+
+    document.getElementById('startOffset').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          startOffset: parseInt(e.target.value)
+        }
+      }, '*');
+    };
+
+    document.getElementById('endOffset').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-style',
+          endOffset: parseInt(e.target.value)
+        }
+      }, '*');
+    };
+
+    // Listen for routing setting changes
+    document.getElementById('orthogonal').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-routing',
+          orthogonalOnly: e.target.checked
+        }
+      }, '*');
+    };
+
+    document.getElementById('autoAvoid').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-routing',
+          autoAvoidObstacles: e.target.checked
+        }
+      }, '*');
+    };
+
+    document.getElementById('cornerRadius').onchange = (e) => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'update-routing',
+          cornerRadius: parseInt(e.target.value)
+        }
+      }, '*');
+    };
   </script>
 </body>
 </html>
