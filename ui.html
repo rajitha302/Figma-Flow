@@ -145,9 +145,45 @@
       align-items: center;
     }
 
+    .color-presets {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .color-preset {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+
+    .color-preset:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 1);
+    }
+
+    .color-preset:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .color-preset.selected {
+      border-color: #007AFF;
+      border-width: 3px;
+      box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2),
+                  0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
     input[type="color"] {
       width: 36px;
-      height: 30px;
+      height: 32px;
       border: 0.5px solid rgba(0, 0, 0, 0.08);
       border-radius: 6px;
       cursor: pointer;
@@ -340,15 +376,20 @@
       </select>
     </div>
 
-    <div class="input-row">
-      <div class="form-group">
-        <label>Color</label>
-        <input type="color" id="strokeColor" value="#000000">
+    <div class="form-group">
+      <label>Color</label>
+      <div class="color-presets">
+        <button class="color-preset" data-color="#000000" style="background: #000000;" title="Black"></button>
+        <button class="color-preset" data-color="#666666" style="background: #666666;" title="Gray"></button>
+        <button class="color-preset" data-color="#5E5CE6" style="background: #5E5CE6;" title="Purple"></button>
+        <button class="color-preset" data-color="#30C9E8" style="background: #30C9E8;" title="Cyan"></button>
+        <input type="color" id="strokeColor" value="#000000" title="Custom Color">
       </div>
-      <div class="form-group">
-        <label>Width (px)</label>
-        <input type="number" id="strokeWidth" value="20" min="1" max="50">
-      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Width (px)</label>
+      <input type="number" id="strokeWidth" value="20" min="1" max="50">
     </div>
 
     <div class="input-row">
@@ -356,20 +397,15 @@
         <label>Start Terminal</label>
         <select id="startTerminal">
           <option value="none" selected>None</option>
-          <option value="arrow">Arrow</option>
-          <option value="circle">Circle</option>
-          <option value="diamond">Diamond</option>
-          <option value="square">Square</option>
+          <option value="dot">● Dot</option>
         </select>
       </div>
       <div class="form-group">
         <label>End Terminal</label>
         <select id="endTerminal">
-          <option value="arrow" selected>Arrow</option>
           <option value="none">None</option>
-          <option value="circle">Circle</option>
-          <option value="diamond">Diamond</option>
-          <option value="square">Square</option>
+          <option value="triangle-arrow" selected>▶ Triangle Arrow</option>
+          <option value="line-arrow">→ Line Arrow</option>
         </select>
       </div>
     </div>
@@ -499,7 +535,36 @@
       }, '*');
     };
 
+    // Color preset buttons
+    document.querySelectorAll('.color-preset').forEach(button => {
+      button.onclick = () => {
+        const color = button.getAttribute('data-color');
+        // Update the color picker value
+        document.getElementById('strokeColor').value = color;
+        // Update selected state
+        document.querySelectorAll('.color-preset').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        // Send to plugin
+        const rgb = hexToRgb(color);
+        if (rgb) {
+          parent.postMessage({
+            pluginMessage: {
+              type: 'update-style',
+              strokeColor: rgb
+            }
+          }, '*');
+        }
+      };
+    });
+
+    // Set first preset as selected by default
+    document.querySelector('.color-preset').classList.add('selected');
+
+    // Custom color picker
     document.getElementById('strokeColor').onchange = (e) => {
+      // Remove selected state from presets when using custom color
+      document.querySelectorAll('.color-preset').forEach(btn => btn.classList.remove('selected'));
+
       const rgb = hexToRgb(e.target.value);
       if (rgb) {
         parent.postMessage({

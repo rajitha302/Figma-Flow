@@ -358,6 +358,20 @@ figmaflow/
 
 ## 📚 Resources & References (Updated 2025)
 
+### 📖 Complete API Documentation
+For comprehensive Figma Plugin API documentation with code examples and best practices, see:
+**[FIGMA_API_REFERENCE.md](FIGMA_API_REFERENCE.md)** - Complete developer reference for FigmaFlow
+
+This reference includes:
+- Plugin manifest configuration
+- Vector & path creation APIs
+- Selection handling & event system
+- UI communication patterns
+- Stroke & fill styling
+- Data storage methods
+- Best practices & performance tips
+- Real-world code examples
+
 ### Official Figma Documentation
 - **Plugin Docs**: https://developers.figma.com/docs/plugins/
 - **API Reference**: https://developers.figma.com/docs/plugins/api/api-reference/

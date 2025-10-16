@@ -14,7 +14,7 @@
 | 2 | Edge-to-Edge Connection | ✅ Passed | Horizontal and vertical edge detection working correctly |
 | 3 | Orthogonal Routing | ✅ Passed | Toggle switches between orthogonal and straight lines correctly |
 | 4 | Auto-Update on Move | ✅ Passed | Instant real-time updates with zero delay, smooth and fluid |
-| 5 | Terminal Styling | ✅ Passed | Arrow heads appear correctly using native Figma strokeCap |
+| 5 | Terminal Styling | ✅ Passed | Native strokeCap terminals (Dot, Triangle Arrow, Line Arrow) - single path elements |
 | 6 | Line Styles | ⏳ Not Tested | |
 | 7 | Stroke Customization | ⏳ Not Tested | |
 | 8 | Offset Controls | ⏳ Not Tested | |
@@ -149,24 +149,46 @@
 ---
 
 ## Test 5: Terminal Styling
-**Feature**: Different arrow head/tail styles
+**Feature**: Native Figma strokeCap terminal types
 
 ### Test Steps
-1. Change **Start Terminal** to "Circle"
-2. Change **End Terminal** to "Diamond"
-3. Create a flow
-4. Try other combinations: Square, Arrow, None
+1. Test **Start Terminal** options:
+   - None (default)
+   - ● Dot (filled circle)
+2. Test **End Terminal** options:
+   - None
+   - ▶ Triangle Arrow (default - filled triangle)
+   - → Line Arrow (simple line arrow)
+3. Create flows with different combinations
+4. Test terminal persistence during drag operations
 
 ### Expected Result
-- ✅ Circle appears at start point
-- ✅ Diamond appears at end point
-- ✅ Terminal decorations are correct size
-- ✅ All terminal types render correctly
+- ✅ Dot terminal appears as filled circle at start point
+- ✅ Triangle Arrow appears as filled triangle at end point
+- ✅ Line Arrow appears as simple arrow at end point
+- ✅ All terminals are part of the vectorNetwork (single path element)
+- ✅ Terminals scale proportionally with stroke width
+- ✅ Terminals persist and update during rectangle movement
 
 ### Actual Result
-**Status**: ⏳ Not Tested
+**Status**: ✅ **PASSED**
 
 **Notes**:
+- ✅ All three terminal types implemented using native Figma strokeCap
+- ✅ Dot uses `CIRCLE_FILLED` strokeCap (native, added in Figma Update 114, June 2025)
+- ✅ Triangle Arrow uses `ARROW_EQUILATERAL` strokeCap (filled triangular arrow)
+- ✅ Line Arrow uses `ARROW_LINES` strokeCap (simple line-style arrow)
+- ✅ All terminals appear instantly on flow creation
+- ✅ All terminals update smoothly during drag operations
+- ✅ Terminals are single path elements (not separate vector shapes)
+- ✅ Size automatically scales with stroke width - no manual sizing needed
+- ✅ Bulletproof implementation using official Figma API
+
+**Technical Implementation**:
+- Uses vectorNetwork with per-vertex strokeCap properties
+- Copy-modify-reassign pattern for applying strokeCaps
+- No custom decorations needed - all native Figma rendering
+- Matches competitor implementation approach
 
 ---
 
@@ -191,19 +213,27 @@
 ---
 
 ## Test 7: Stroke Customization
-**Feature**: Color and width changes
+**Feature**: Color presets and width changes
 
 ### Test Steps
-1. Change **Color** to red (#FF0000)
-2. Change **Width** to 5px
-3. Create a flow
-4. Change **Width** to 30px
-5. Create another flow
+1. Test **Color Presets**:
+   - Click Black preset (#000000) - should be selected by default
+   - Click Gray preset (#666666)
+   - Click Purple preset (#5E5CE6)
+   - Click Cyan preset (#30C9E8)
+2. Test **Custom Color**:
+   - Click custom color picker
+   - Choose red (#FF0000)
+3. Change **Width** to 5px, create a flow
+4. Change **Width** to 30px, create another flow
 
 ### Expected Result
+- ✅ Color presets provide quick color selection
+- ✅ Selected preset has visual indicator (highlighted border)
+- ✅ Custom color picker deselects presets when used
 - ✅ Red arrow with 5px width
 - ✅ Thick 30px arrow
-- ✅ Color picker works correctly
+- ✅ All color options work correctly
 
 ### Actual Result
 **Status**: ⏳ Not Tested
@@ -276,17 +306,17 @@
 ---
 
 ## Test 11: Clear All
-**Feature**: Remove all flows and decorations
+**Feature**: Remove all flows
 
 ### Test Steps
-1. Create 3-4 flows with different terminal styles (circles, diamonds)
+1. Create 3-4 flows with different terminal styles (Dot, Triangle Arrow, Line Arrow)
 2. Click **"Clear All"** button
 3. Confirm the dialog
 4. Check the canvas
 
 ### Expected Result
-- ✅ All arrows removed
-- ✅ All terminal decorations removed (no orphaned shapes)
+- ✅ All arrows removed (including native strokeCap terminals)
+- ✅ No orphaned shapes on canvas
 - ✅ Flow counter resets to 0
 - ✅ Confirmation dialog appears
 
@@ -443,4 +473,4 @@ The root cause was identified as expensive obstacle detection and delays:
 
 ---
 
-*Last Updated: October 15, 2025*
+*Last Updated: October 16, 2025*

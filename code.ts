@@ -36,7 +36,7 @@ let currentStyle = {
   strokeColor: { r: 0, g: 0, b: 0 }, // Black like Autoflow
   strokeWidth: 20,
   startTerminal: 'none',
-  endTerminal: 'arrow',
+  endTerminal: 'triangle-arrow', // Default to triangle arrow
   startOffset: 20, // Default offset like Autoflow
   endOffset: 20,
 };
@@ -138,21 +138,24 @@ function createFlowConnection(source: SceneNode, target: SceneNode) {
   arrow.name = `Flow: ${source.name} → ${target.name}`;
 
   // Create path with arrow heads using vector network
+  const hasStartArrow = currentStyle.startTerminal === 'triangle-arrow' || currentStyle.startTerminal === 'line-arrow';
+  const hasEndArrow = currentStyle.endTerminal === 'triangle-arrow' || currentStyle.endTerminal === 'line-arrow';
+
   if (routingSettings.orthogonalOnly) {
     // Get points for orthogonal path
     const points = getOrthogonalPathPoints(startPoint, endPoint, startEdge, endEdge);
     const network = createVectorNetworkWithArrows(
       points,
-      currentStyle.startTerminal === 'arrow',
-      currentStyle.endTerminal === 'arrow'
+      hasStartArrow,
+      hasEndArrow
     );
     arrow.vectorNetwork = network;
   } else {
     // Straight line
     const network = createVectorNetworkWithArrows(
       [startPoint, endPoint],
-      currentStyle.startTerminal === 'arrow',
-      currentStyle.endTerminal === 'arrow'
+      hasStartArrow,
+      hasEndArrow
     );
     arrow.vectorNetwork = network;
   }
@@ -161,13 +164,32 @@ function createFlowConnection(source: SceneNode, target: SceneNode) {
   // This is the pattern that works according to Figma examples
   const networkCopy = JSON.parse(JSON.stringify(arrow.vectorNetwork));
 
-  // Ensure all vertices have explicit strokeCap
+  // Ensure all vertices have explicit strokeCap (including native CIRCLE_FILLED for dot)
   for (let i = 0; i < networkCopy.vertices.length; i++) {
-    if (i === 0 && currentStyle.startTerminal === 'arrow') {
-      networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
-    } else if (i === networkCopy.vertices.length - 1 && currentStyle.endTerminal === 'arrow') {
-      networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+    if (i === 0) {
+      // Start terminal
+      if (currentStyle.startTerminal === 'triangle-arrow') {
+        networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+      } else if (currentStyle.startTerminal === 'line-arrow') {
+        networkCopy.vertices[i].strokeCap = 'ARROW_LINES';
+      } else if (currentStyle.startTerminal === 'dot') {
+        networkCopy.vertices[i].strokeCap = 'CIRCLE_FILLED';
+      } else {
+        networkCopy.vertices[i].strokeCap = 'NONE';
+      }
+    } else if (i === networkCopy.vertices.length - 1) {
+      // End terminal
+      if (currentStyle.endTerminal === 'triangle-arrow') {
+        networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+      } else if (currentStyle.endTerminal === 'line-arrow') {
+        networkCopy.vertices[i].strokeCap = 'ARROW_LINES';
+      } else if (currentStyle.endTerminal === 'dot') {
+        networkCopy.vertices[i].strokeCap = 'CIRCLE_FILLED';
+      } else {
+        networkCopy.vertices[i].strokeCap = 'NONE';
+      }
     } else {
+      // Middle vertices (corners)
       networkCopy.vertices[i].strokeCap = 'NONE';
     }
   }
@@ -201,28 +223,12 @@ function createFlowConnection(source: SceneNode, target: SceneNode) {
   arrow.locked = false;
 
   // IMPORTANT: Force refresh the vectorNetwork to ensure strokeCaps are applied
-  // This seems to be necessary for arrow heads to appear on initial creation
+  // This seems to be necessary for arrow heads and dots to appear on initial creation
   const currentNetwork = arrow.vectorNetwork;
   arrow.vectorNetwork = JSON.parse(JSON.stringify(currentNetwork));
 
-  // Create terminal decorations if needed (only for non-arrow types)
+  // No custom decorations needed - all terminals (dot, arrows) handled by native strokeCap
   const decorations: SceneNode[] = [];
-
-  if (currentStyle.startTerminal !== 'none' && currentStyle.startTerminal !== 'arrow') {
-    const startDecoration = createTerminalDecoration(startPoint, currentStyle.startTerminal, currentStyle, 'start', startEdge);
-    if (startDecoration) {
-      figma.currentPage.appendChild(startDecoration);
-      decorations.push(startDecoration);
-    }
-  }
-
-  if (currentStyle.endTerminal !== 'none' && currentStyle.endTerminal !== 'arrow') {
-    const endDecoration = createTerminalDecoration(endPoint, currentStyle.endTerminal, currentStyle, 'end', endEdge);
-    if (endDecoration) {
-      figma.currentPage.appendChild(endDecoration);
-      decorations.push(endDecoration);
-    }
-  }
 
   // Store connection
   const connection: FlowConnection = {
@@ -287,31 +293,53 @@ function updateAffectedConnectionsFast(changedNodeIds: Set<string>) {
       const newArrow = figma.createVector();
 
       // Create vector network with arrow heads
+      const hasStartArrow = connection.style.startTerminal === 'triangle-arrow' || connection.style.startTerminal === 'line-arrow';
+      const hasEndArrow = connection.style.endTerminal === 'triangle-arrow' || connection.style.endTerminal === 'line-arrow';
+
       if (routingSettings.orthogonalOnly) {
         const points = getOrthogonalPathPoints(startPoint, endPoint, startEdge, endEdge);
         const network = createVectorNetworkWithArrows(
           points,
-          connection.style.startTerminal === 'arrow',
-          connection.style.endTerminal === 'arrow'
+          hasStartArrow,
+          hasEndArrow
         );
         newArrow.vectorNetwork = network;
       } else {
         const network = createVectorNetworkWithArrows(
           [startPoint, endPoint],
-          connection.style.startTerminal === 'arrow',
-          connection.style.endTerminal === 'arrow'
+          hasStartArrow,
+          hasEndArrow
         );
         newArrow.vectorNetwork = network;
       }
 
-      // IMPORTANT: Apply the copy-modify-reassign pattern for strokeCaps
+      // IMPORTANT: Apply the copy-modify-reassign pattern for strokeCaps (including CIRCLE_FILLED)
       const networkCopy = JSON.parse(JSON.stringify(newArrow.vectorNetwork));
       for (let i = 0; i < networkCopy.vertices.length; i++) {
-        if (i === 0 && connection.style.startTerminal === 'arrow') {
-          networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
-        } else if (i === networkCopy.vertices.length - 1 && connection.style.endTerminal === 'arrow') {
-          networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+        if (i === 0) {
+          // Start terminal
+          if (connection.style.startTerminal === 'triangle-arrow') {
+            networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+          } else if (connection.style.startTerminal === 'line-arrow') {
+            networkCopy.vertices[i].strokeCap = 'ARROW_LINES';
+          } else if (connection.style.startTerminal === 'dot') {
+            networkCopy.vertices[i].strokeCap = 'CIRCLE_FILLED';
+          } else {
+            networkCopy.vertices[i].strokeCap = 'NONE';
+          }
+        } else if (i === networkCopy.vertices.length - 1) {
+          // End terminal
+          if (connection.style.endTerminal === 'triangle-arrow') {
+            networkCopy.vertices[i].strokeCap = 'ARROW_EQUILATERAL';
+          } else if (connection.style.endTerminal === 'line-arrow') {
+            networkCopy.vertices[i].strokeCap = 'ARROW_LINES';
+          } else if (connection.style.endTerminal === 'dot') {
+            networkCopy.vertices[i].strokeCap = 'CIRCLE_FILLED';
+          } else {
+            networkCopy.vertices[i].strokeCap = 'NONE';
+          }
         } else {
+          // Middle vertices (corners)
           networkCopy.vertices[i].strokeCap = 'NONE';
         }
       }
@@ -457,7 +485,7 @@ function createOrthogonalPathFast(
   };
 }
 
-// Update terminal decorations positions
+// Update terminal decorations positions - Not needed for native strokeCap
 function updateTerminalDecorations(
   connection: FlowConnection,
   startPoint: { x: number; y: number },
@@ -465,72 +493,7 @@ function updateTerminalDecorations(
   startEdge: string,
   endEdge: string
 ) {
-  // Terminal decorations are stored in order: [start, end]
-  // Update their positions based on the current style
-  const size = connection.style.strokeWidth * 2.5;
-
-  connection.decorationNodes.forEach((decoration, index) => {
-    const point = index === 0 ? startPoint : endPoint;
-    const edge = index === 0 ? startEdge : endEdge;
-
-    if ('x' in decoration && 'y' in decoration) {
-      // For shapes with x/y properties (circles, rectangles)
-      decoration.x = point.x - size / 2;
-      decoration.y = point.y - size / 2;
-    } else if ('vectorPaths' in decoration) {
-      // For vector nodes (diamonds, arrows), recreate the path at new position
-      const vectorDecoration = decoration as VectorNode;
-      const decorationName = vectorDecoration.name;
-
-      if (decorationName.includes('Arrow')) {
-        // Update arrow decoration with proper rotation based on edge
-        const arrowLength = connection.style.strokeWidth * 2;
-        const arrowWidth = connection.style.strokeWidth * 1.6;
-
-        let arrowPath: VectorPath;
-        switch (edge) {
-          case 'right':
-            arrowPath = {
-              windingRule: 'NONZERO',
-              data: `M ${point.x + arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-            };
-            break;
-          case 'left':
-            arrowPath = {
-              windingRule: 'NONZERO',
-              data: `M ${point.x - arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-            };
-            break;
-          case 'bottom':
-            arrowPath = {
-              windingRule: 'NONZERO',
-              data: `M ${point.x} ${point.y + arrowLength} L ${point.x - arrowWidth} ${point.y} L ${point.x + arrowWidth} ${point.y} Z`,
-            };
-            break;
-          case 'top':
-            arrowPath = {
-              windingRule: 'NONZERO',
-              data: `M ${point.x} ${point.y - arrowLength} L ${point.x - arrowWidth} ${point.y} L ${point.x + arrowWidth} ${point.y} Z`,
-            };
-            break;
-          default:
-            arrowPath = {
-              windingRule: 'NONZERO',
-              data: `M ${point.x + arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-            };
-        }
-        vectorDecoration.vectorPaths = [arrowPath];
-      } else if (decorationName.includes('Diamond')) {
-        // Update diamond decoration
-        const halfSize = size / 2;
-        const diamondPath: VectorPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x} ${point.y - halfSize} L ${point.x + halfSize} ${point.y} L ${point.x} ${point.y + halfSize} L ${point.x - halfSize} ${point.y} Z`,
-        };
-        vectorDecoration.vectorPaths = [diamondPath];
-      }
-    }
-  });
+  // All terminals use native strokeCap - they auto-update with vectorNetwork
 }
 
 // Store node position for tracking
@@ -916,7 +879,7 @@ function createArrowPath(start: { x: number; y: number }, end: { x: number; y: n
   return path;
 }
 
-// Create terminal decoration (circle, diamond, square)
+// Create terminal decoration - Not needed, all terminals use native strokeCap
 function createTerminalDecoration(
   point: { x: number; y: number },
   type: string,
@@ -924,93 +887,7 @@ function createTerminalDecoration(
   direction: 'start' | 'end',
   edge: string
 ): SceneNode | null {
-  const size = style.strokeWidth * 2.5;
-
-  if (type === 'arrow') {
-    // Create proper filled arrow terminal that rotates based on edge direction
-    const arrow = figma.createVector();
-    const arrowLength = style.strokeWidth * 2; // Length of arrow
-    const arrowWidth = style.strokeWidth * 1.6; // Width of arrow wings
-
-    // Create filled triangle arrow based on the edge direction
-    let arrowPath: VectorPath;
-
-    switch (edge) {
-      case 'right':
-        // Arrow pointing right (→)
-        arrowPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x + arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-        };
-        break;
-      case 'left':
-        // Arrow pointing left (←)
-        arrowPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x - arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-        };
-        break;
-      case 'bottom':
-        // Arrow pointing down (↓)
-        arrowPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x} ${point.y + arrowLength} L ${point.x - arrowWidth} ${point.y} L ${point.x + arrowWidth} ${point.y} Z`,
-        };
-        break;
-      case 'top':
-        // Arrow pointing up (↑)
-        arrowPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x} ${point.y - arrowLength} L ${point.x - arrowWidth} ${point.y} L ${point.x + arrowWidth} ${point.y} Z`,
-        };
-        break;
-      default:
-        // Default to right
-        arrowPath = {
-          windingRule: 'NONZERO',
-          data: `M ${point.x + arrowLength} ${point.y} L ${point.x} ${point.y - arrowWidth} L ${point.x} ${point.y + arrowWidth} Z`,
-        };
-    }
-
-    arrow.vectorPaths = [arrowPath];
-    arrow.fills = [{ type: 'SOLID', color: style.strokeColor }];
-    arrow.strokes = [];
-    arrow.name = 'Terminal: Arrow';
-    return arrow;
-  } else if (type === 'circle') {
-    const circle = figma.createEllipse();
-    circle.x = point.x - size / 2;
-    circle.y = point.y - size / 2;
-    circle.resize(size, size);
-    circle.fills = [{ type: 'SOLID', color: style.strokeColor }];
-    circle.strokes = [];
-    circle.name = 'Terminal: Circle';
-    return circle;
-  } else if (type === 'diamond') {
-    // Create diamond using vector path for accurate diamond shape
-    const diamond = figma.createVector();
-    const halfSize = size / 2;
-    // Create diamond path: top, right, bottom, left points forming a diamond
-    const diamondPath: VectorPath = {
-      windingRule: 'NONZERO',
-      data: `M ${point.x} ${point.y - halfSize} L ${point.x + halfSize} ${point.y} L ${point.x} ${point.y + halfSize} L ${point.x - halfSize} ${point.y} Z`,
-    };
-    diamond.vectorPaths = [diamondPath];
-    diamond.fills = [{ type: 'SOLID', color: style.strokeColor }];
-    diamond.strokes = [];
-    diamond.name = 'Terminal: Diamond';
-    return diamond;
-  } else if (type === 'square') {
-    const square = figma.createRectangle();
-    square.x = point.x - size / 2;
-    square.y = point.y - size / 2;
-    square.resize(size, size);
-    square.fills = [{ type: 'SOLID', color: style.strokeColor }];
-    square.strokes = [];
-    square.name = 'Terminal: Square';
-    return square;
-  }
-
+  // All terminals (dot, triangle-arrow, line-arrow) use native strokeCap
   return null;
 }
 
